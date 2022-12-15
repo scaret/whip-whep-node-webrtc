@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WHIP</title>
+</head>
+<body>
+    <label>
+        Endpoint
+        <input type="text" id="endpoint" size="100">
+    </label>
+    <br/>
+    <label>
+        Channel ID
+        <input type="text" id="channelId" size="100">
+    </label>
+    <br/>
+    <button id="start-camera">Camera</button>
+    <br/>
+    <video id="video" autoplay muted playsinline width="800"></video>
+    <br/>
+    <span id="location"></span>
+    <br/>
+    <ul id="links"></ul>
+    <br/>
+    <script src="../node_modules/axios/dist/axios.min.js"></script>
+    <script src="send.js"></script>
+</body>
+</html>
