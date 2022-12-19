@@ -1,5 +1,6 @@
-// let endpoint = `https://localhost.wrtc.dev:4000`
-let endpoint = `https://whip.dev.eyevinn.technology/api/v1/whip/broadcaster`
+let endpoint = `https://localhost.wrtc.dev:8765/whip`
+// let endpoint = `https://whip.dev.eyevinn.technology/api/v1/whip/broadcaster`
+// eyelynn link: https://web.whip.eyevinn.technology/
 
 const rtc = {
     location: null,
