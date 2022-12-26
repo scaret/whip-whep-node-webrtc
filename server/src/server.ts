@@ -5,7 +5,7 @@ const os = require('os')
 const path = require('path')
 const bodyParser = require('body-parser')
 
-const {handleWhip} = require("./handlers");
+const {handleWhip} = require("./handler")
 
 var privateKey  = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'key.pem'), 'utf8');
 var certificate = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'cert.pem'), 'utf8');
@@ -28,7 +28,7 @@ app.use((req, res, next)=>{
     }
 })
 
-app.use('/client', express.static(path.join(__dirname, '../client')))
+app.use('/client', express.static(path.join(__dirname, '../../client')))
 
 app.get('/hello', (req, res, next)=>{
     res.send('hello')

@@ -4,8 +4,7 @@
   "description": "A simple WHIP/WHEP implementation using node-webrtc library",
   "main": "index.js",
   "scripts": {
-    "client": "badcert",
-    "server": "node server/server.js",
+    "dev": "cd server && npm run dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,14 +16,5 @@
   "bugs": {
     "url": "https://github.com/scaret/whip-whep-node-webrtc/issues"
   },
-  "homepage": "https://github.com/scaret/whip-whep-node-webrtc#readme",
-  "dependencies": {
-    "axios": "^0.21.4",
-    "badcert": "^4.2.0",
-    "body-parser": "^1.20.1",
-    "sdp-transform": "^2.14.1",
-    "server": "^1.0.38",
-    "uuidv4": "^6.2.13",
-    "wrtc": "^0.4.7"
-  }
+  "homepage": "https://github.com/scaret/whip-whep-node-webrtc#readme"
 }
