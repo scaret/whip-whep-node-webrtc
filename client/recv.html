@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WHEP</title>
+</head>
+<body>
+<label>
+    Endpoint
+    <input type="text" id="endpoint" size="100">
+</label>
+<br/>
+<label>
+    Channel ID
+    <input type="text" id="channelId" size="100" value="abcabc">
+</label>
+<br/>
+<button id="start-pull">Pull</button>
+<br/>
+<video id="video" autoplay muted playsinline controls width="800"></video>
+<br/>
+<span id="location"></span>
+<br/>
+<ul id="links"></ul>
+<br/>
+<script src="./vendor/axios.min.js"></script>
+<script src="recv.js"></script>
+</body>
+</html>

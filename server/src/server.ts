@@ -1,11 +1,10 @@
-const fs = require('fs');
-const https = require('https');
-const express = require('express')
-const os = require('os')
-const path = require('path')
-const bodyParser = require('body-parser')
-
-const {handleWhip} = require("./handler")
+import fs from 'fs'
+import https from 'https'
+import express from 'express'
+import os from 'os'
+import path from 'path'
+import bodyParser from "body-parser";
+import {handleWhip, handleWhep} from './handler'
 
 var privateKey  = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'key.pem'), 'utf8');
 var certificate = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'cert.pem'), 'utf8');
@@ -35,6 +34,7 @@ app.get('/hello', (req, res, next)=>{
 })
 
 app.post('/whip', handleWhip)
+app.post('/whep', handleWhep)
 
 var httpsServer = https.createServer(credentials, app);
 const PORT = 8765
