@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>WHEP</title>
+    <link rel="shortcut icon" href="#">
 </head>
 <body>
 <label>
@@ -15,9 +16,18 @@
     <input type="text" id="channelId" size="100" value="abcabc">
 </label>
 <br/>
+<label>
+    Audio Num
+    <input type="number" id="audioNum" value="1">
+</label>
+<label>
+    Video Num
+    <input type="number" id="videoNum" value="1">
+</label>
+<br/>
 <button id="start-pull">Pull</button>
 <br/>
-<video id="video" autoplay muted playsinline controls width="800"></video>
+<div id="medias"></div>
 <br/>
 <span id="location"></span>
 <br/>

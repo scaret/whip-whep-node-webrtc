@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>WHIP</title>
+    <link rel="shortcut icon" href="#">
 </head>
 <body>
     <label>
@@ -15,9 +16,17 @@
         <input type="text" id="channelId" size="100" value="abcabc">
     </label>
     <br/>
-    <button id="start-camera">Camera</button>
+    <label>
+        Select Camera: <select id="cameraIds" multiple></select>
+    </label>
+    <label>
+        Select Microphone: <select id="micIds" multiple></select>
+    </label>
+    <button id="refresh-devices">Refresh Devices</button>
     <br/>
-    <video id="video" autoplay muted playsinline controls width="800"></video>
+    <button id="start-push">Push</button>
+    <br/>
+    <div id="medias"></div>
     <br/>
     <span id="location"></span>
     <br/>

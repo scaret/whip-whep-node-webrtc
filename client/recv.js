@@ -80,7 +80,6 @@ const resetEnv = ()=>{
 const tempDiv = document.createElement('div')
 
 const updateView = ()=>{
-    document.getElementById('video').srcObject = rtc.mediaStream
     if (rtc.links){
         let html = ''
         rtc.links.forEach((link)=>{
@@ -113,16 +112,31 @@ const initPC = ()=>{
             resetEnv()
         }
     }
-    rtc.audio.transceiver = rtc.peerConnection.addTransceiver('audio', {
-        direction: 'recvonly'
-    })
-    rtc.video.transceiver = rtc.peerConnection.addTransceiver('video', {
-        direction: 'recvonly'
-    })
-    rtc.mediaStream = new MediaStream([
-        rtc.audio.transceiver.receiver.track,
-        rtc.video.transceiver.receiver.track
-    ])
+    document.getElementById('medias').innerHTML = ''
+    const audioNum = parseInt(document.getElementById('audioNum').value)
+    for (let i = 0; i <audioNum; i++){
+        const transceiver = rtc.peerConnection.addTransceiver('audio', {
+            direction: 'recvonly'
+        })
+        const audioElem =document.createElement('audio')
+        audioElem.controls = true
+        audioElem.srcObject = new MediaStream([transceiver.receiver.track])
+        document.getElementById('medias').appendChild(audioElem)
+    }
+    const videoNum = parseInt(document.getElementById('videoNum').value)
+    for (let i = 0; i < videoNum; i++){
+        const transceiver = rtc.peerConnection.addTransceiver('video', {
+            direction: 'recvonly'
+        })
+        const videoElem =document.createElement('video')
+        videoElem.style.width = '800px'
+        videoElem.controls = true
+        videoElem.playsInline = true
+        videoElem.muted = true
+        videoElem.autoplay = true
+        videoElem.srcObject = new MediaStream([transceiver.receiver.track])
+        document.getElementById('medias').appendChild(videoElem)
+    }
 }
 
 const startPull = async ()=>{

@@ -4,16 +4,10 @@ let endpoint = `https://localhost.wrtc.dev:8765/whip`
 
 const rtc = {
     location: null,
-    mediaStream: null,
+    mediaStreams: [],
     peerConnection: null,
-    audio: {
-        transceiver: null,
-        track: null,
-    },
-    video: {
-        transceiver: null,
-        track: null
-    },
+    audio: [],
+    video: [],
     offer: null,
 }
 
@@ -68,18 +62,71 @@ const createResource = async ()=>{
     rtc.peerConnection.setRemoteDescription(rtc.answer)
 }
 
-const initMediaStream = async ()=>{
-    rtc.mediaStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true
-    })
-    rtc.audio.track = rtc.mediaStream.getAudioTracks()[0]
-    rtc.video.track = rtc.mediaStream.getVideoTracks()[0]
-    if (rtc.audio.track){
-        rtc.audio.transceiver.sender.replaceTrack(rtc.audio.track)
+const getSelectedDevices = (mediaType)=>{
+    let options
+    if (mediaType === "audio"){
+        options = [...document.getElementsByClassName('mic-option')].filter((option)=>{
+            return option.selected
+        })
+    } else {
+        options = [...document.getElementsByClassName('camera-option')].filter((option)=>{
+            return option.selected
+        })
     }
-    if (rtc.video.track){
-        rtc.video.transceiver.sender.replaceTrack(rtc.video.track)
+    return options
+}
+
+const initMediaStream = async ()=>{
+    const micOptions = getSelectedDevices('audio')
+    const cameraOptions = getSelectedDevices('video')
+    let audioCnt = 0
+    let videoCnt = 0
+    document.getElementById('medias').innerHTML = ''
+    for (let i = 0; i < micOptions.length; i++){
+        const micOption = micOptions[i]
+        console.log(`Audio ${micOption.value} ${micOption.innerText}`)
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                deviceId: micOption.value
+            }
+        })
+        const track = mediaStream.getTracks()[0]
+        if (rtc.audio[audioCnt]){
+            rtc.audio[audioCnt].track = track
+            rtc.audio[audioCnt].transceiver.sender.replaceTrack(track)
+        } else {
+            rtc.audio[audioCnt] = {track}
+        }
+        const audioElem =document.createElement('audio')
+        audioElem.controls = true
+        audioElem.srcObject = mediaStream
+        document.getElementById('medias').appendChild(audioElem)
+        audioCnt++
+    }
+    for (let i = 0; i < cameraOptions.length; i++){
+        const cameraOption = cameraOptions[i]
+        console.log(`Video ${cameraOption.value} ${cameraOption.innerText}`)
+        const mediaStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                deviceId: cameraOption.value
+            }
+        })
+        const track = mediaStream.getTracks()[0]
+        if (rtc.video[videoCnt]){
+            rtc.video[videoCnt].track = track
+            rtc.video[videoCnt].transceiver.sender.replaceTrack(track)
+        } else {
+            rtc.video[videoCnt] = {track}
+        }
+        const videoElem =document.createElement('video')
+        videoElem.style.width = '800px'
+        videoElem.controls = true
+        videoElem.playsInline = true
+        videoElem.muted = true
+        videoElem.autoplay = true
+        videoElem.srcObject = mediaStream
+        document.getElementById('medias').appendChild(videoElem)
+        videoCnt++
     }
 }
 
@@ -95,7 +142,6 @@ const resetEnv = ()=>{
 const tempDiv = document.createElement('div')
 
 const updateView = ()=>{
-    document.getElementById('video').srcObject = rtc.mediaStream
     if (rtc.links){
         let html = ''
         rtc.links.forEach((link)=>{
@@ -110,6 +156,11 @@ const updateView = ()=>{
 }
 
 const initPC = ()=>{
+    if (rtc.peerConnection){
+        rtc.peerConnection.close()
+        rtc.audio = []
+        rtc.video = []
+    }
     rtc.peerConnection = new RTCPeerConnection()
     rtc.peerConnection.onconnectionstatechange = ()=>{
         console.log('rtc.peerConnection.onconnectionstatechange', rtc.peerConnection.connectionState)
@@ -128,22 +179,68 @@ const initPC = ()=>{
             resetEnv()
         }
     }
-    rtc.audio.transceiver = rtc.peerConnection.addTransceiver('audio', {
-        direction: 'sendonly'
-    })
-    rtc.video.transceiver = rtc.peerConnection.addTransceiver('video', {
-        direction: 'sendonly'
-    })
+    const audioDevices = getSelectedDevices('audio')
+    for (let i = 0; i < audioDevices.length; i++){
+        const transceiver = rtc.peerConnection.addTransceiver('audio', {
+            direction: 'sendonly'
+        })
+        if (rtc.audio[i]){
+            rtc.audio[i].transceiver = transceiver
+            transceiver.replaceTrack(rtc.audio[i].track)
+        }else {
+            rtc.audio[i] = {transceiver}
+        }
+    }
+    const videoDevices = getSelectedDevices('video')
+    for (let i = 0; i < videoDevices.length; i++){
+        const transceiver = rtc.peerConnection.addTransceiver('video', {
+            direction: 'sendonly'
+        })
+        if (rtc.video[i]){
+            rtc.video[i].transceiver = transceiver
+            transceiver.replaceTrack(rtc.video[i].track)
+        }else {
+            rtc.video[i] = {transceiver}
+        }
+    }
 }
 
-const startCamera = async ()=>{
+const startPush = async ()=>{
     initPC()
     await Promise.all([createResource(), initMediaStream()])
 }
 
+let refreshDeviceCnt = 0
+const refreshDevices = async ()=>{
+    let devices = null
+    if (refreshDeviceCnt){
+        const mediaStream = await navigator.mediaDevices.getUserMedia({audio: true, video: true})
+        devices = await navigator.mediaDevices.enumerateDevices()
+        mediaStream.getTracks().forEach((track)=>{
+            track.stop()
+        })
+    } else {
+        devices = await navigator.mediaDevices.enumerateDevices()
+    }
+    refreshDeviceCnt++
+    let cameraHtml = ''
+    let micHtml = ''
+    for (let i in devices){
+        if (devices[i].kind === 'audioinput'){
+            micHtml += `<option class="mic-option" value="${devices[i].deviceId}" ${micHtml ? "": "selected"}>${devices[i].label}</option>`
+        } else if (devices[i].kind === 'videoinput'){
+            cameraHtml += `<option class="camera-option" value="${devices[i].deviceId}" ${cameraHtml ? "": "selected"}>${devices[i].label}</option>`
+        }
+    }
+    document.getElementById('cameraIds').innerHTML = cameraHtml
+    document.getElementById('micIds').innerHTML = micHtml
+}
+
 const main = async ()=>{
+    refreshDevices()
     document.getElementById('endpoint').value = endpoint
-    document.getElementById('start-camera').onclick = startCamera
+    document.getElementById('start-push').onclick = startPush
+    document.getElementById('refresh-devices').onclick = refreshDevices
 }
 
 main()

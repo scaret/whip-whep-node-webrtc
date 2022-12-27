@@ -6,8 +6,12 @@ console.log(wrtc)
 
 import {endpoint} from "./Endpoint";
 
-const dummyAudioTrack:MediaStreamTrack = new wrtc.nonstandard.RTCAudioSource().createTrack()
-const dummyVideoTrack:MediaStreamTrack = new wrtc.nonstandard.RTCVideoSource().createTrack()
+const dummpAudioTracks = []
+const dummyVideoTracks = []
+for (let i = 0; i < 100; i++){
+    dummpAudioTracks.push(new wrtc.nonstandard.RTCAudioSource().createTrack())
+    dummyVideoTracks.push(new wrtc.nonstandard.RTCVideoSource().createTrack())
+}
 
 /**
  * id, pc, offer, answer
@@ -111,8 +115,22 @@ export async function handleWhep(req, res, next){
             }
         }
     })
-    pc.addTrack(dummyAudioTrack)
-    pc.addTrack(dummyVideoTrack)
+    const matches = req.sdp.match(/\r\nm=([a-z]+) /g)
+    if (matches){
+        for (let i = 0; i < matches.length; i++){
+            const kind = matches[i].substring(4, 9)
+            console.log(`kind ${i} ${kind}`)
+            if (kind === 'audio'){
+                pc.addTrack(dummpAudioTracks[i])
+            } else if (kind === 'video'){
+                pc.addTrack(dummyVideoTracks[i])
+            } else {
+                console.error(`Unrecognized m line ${matches[i]}`)
+            }
+        }
+    } else{
+        console.error(`mLine error`, matches)
+    }
     await pc.setRemoteDescription(offer)
     const answer = await pc.createAnswer()
     answerObj = sdpTransform.parse(answer.sdp)
