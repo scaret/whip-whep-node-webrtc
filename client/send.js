@@ -1,4 +1,4 @@
-let endpoint = `https://localhost.wrtc.dev:8765/whip`
+let endpoint = `${window.location.origin}/whip`
 // let endpoint = `https://whip.dev.eyevinn.technology/api/v1/whip/broadcaster`
 // eyelynn link: https://web.whip.eyevinn.technology/
 

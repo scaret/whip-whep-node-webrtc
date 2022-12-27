@@ -68,8 +68,8 @@ export async function handleWhip(req, res, next){
     const channelId = req.query.channelId || v4()
     const channel = endpoint.getChannel(channelId)
     const locationId = channel.setSender(pc)
-    const location = `https://localhost.wrtc.dev:8765/whip/${locationId}`
-    res.header('location', location).end(sdpTransform.write(answerObj))
+    const location = `${req.get('origin')}/whip/${locationId}`
+    res.header('Location', location).end(sdpTransform.write(answerObj))
 }
 
 /**
@@ -139,7 +139,7 @@ export async function handleWhep(req, res, next){
     const channelId = req.query.channelId || v4()
     const channel = endpoint.getChannel(channelId)
     const locationId = channel.setReceiver(pc)
-    const location = `https://localhost.wrtc.dev:8765/whep/${locationId}`
-    res.header('location', location).end(sdpTransform.write(answerObj))
+    const location = `${req.get('origin')}/whep/${locationId}`
+    res.header('Location', location).end(sdpTransform.write(answerObj))
 }
 

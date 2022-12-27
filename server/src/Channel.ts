@@ -108,7 +108,7 @@ export class Channel{
                 const sender = mLine.transceiver.sender
                 if (!sender){
                   console.error(`downstream #${index} has no sender`)
-                } if (!sender.track){
+                } else if (!sender.track){
                     if (track){
                         console.log(`m${index} ${mLine.kind} replaceTrack ${track.kind}`)
                         sender.replaceTrack(track)
