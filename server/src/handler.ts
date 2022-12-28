@@ -69,7 +69,7 @@ export async function handleWhip(req, res, next){
     const channel = endpoint.getChannel(channelId)
     const locationId = channel.setSender(pc)
     const location = `${req.get('origin')}/whip/${locationId}`
-    res.header('Location', location).end(sdpTransform.write(answerObj))
+    res.status(201).header('Location', location).end(sdpTransform.write(answerObj))
 }
 
 /**
@@ -140,6 +140,6 @@ export async function handleWhep(req, res, next){
     const channel = endpoint.getChannel(channelId)
     const locationId = channel.setReceiver(pc)
     const location = `${req.get('origin')}/whep/${locationId}`
-    res.header('Location', location).end(sdpTransform.write(answerObj))
+    res.status(201).header('Location', location).end(sdpTransform.write(answerObj))
 }
 

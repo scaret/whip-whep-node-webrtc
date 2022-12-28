@@ -14,6 +14,10 @@ var credentials = {key: privateKey, cert: certificate};
 
 const app = express()
 
+app.use((req, res, next)=>{
+    res.header('Access-Control-Allow-Private-Network', 'true')
+    next()
+})
 app.use(cors({
     exposedHeaders: 'Location, Link'
 }))
