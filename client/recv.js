@@ -113,8 +113,6 @@ const initPC = ()=>{
         }
     }
     document.getElementById('medias').innerHTML = ''
-    const audioNum = parseInt(document.getElementById('audioNum').value)
-
     const videoNum = parseInt(document.getElementById('videoNum').value)
     for (let i = 0; i < videoNum; i++){
         const transceiver = rtc.peerConnection.addTransceiver('video', {
@@ -129,6 +127,7 @@ const initPC = ()=>{
         videoElem.srcObject = new MediaStream([transceiver.receiver.track])
         document.getElementById('medias').appendChild(videoElem)
     }
+    const audioNum = parseInt(document.getElementById('audioNum').value)
     for (let i = 0; i <audioNum; i++){
         const transceiver = rtc.peerConnection.addTransceiver('audio', {
             direction: 'recvonly'

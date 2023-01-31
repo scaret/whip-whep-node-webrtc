@@ -6,11 +6,7 @@ import path from 'path'
 import bodyParser from "body-parser";
 import {handleWhip, handleWhep} from './handler'
 import cors from 'cors'
-
-var privateKey  = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'key.pem'), 'utf8');
-var certificate = fs.readFileSync(path.join(os.homedir(), '.badcert', '127.0.0.1', 'cert.pem'), 'utf8');
-var credentials = {key: privateKey, cert: certificate};
-
+import {registerLocalIps} from 'badcert-register'
 
 const app = express()
 
@@ -44,8 +40,9 @@ app.get('/hello', (req, res, next)=>{
 app.post('/whip', handleWhip)
 app.post('/whep', handleWhep)
 
-var httpsServer = https.createServer(credentials, app);
-const PORT = 8765
-    console.log(`https://localhost.wrtc.dev:${PORT}/client/send.html`)
-httpsServer.listen(PORT, '0.0.0.0', ()=>{
-});
+registerLocalIps().then((keyAndCert)=>{
+    https.createServer(keyAndCert, app).listen(keyAndCert.port, () => {
+        console.log(`Send: https://${keyAndCert.domain}:${keyAndCert.port}/client/send.html`)
+        console.log(`Recv: https://${keyAndCert.domain}:${keyAndCert.port}/client/recv.html`)
+    })
+})

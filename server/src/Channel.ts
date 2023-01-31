@@ -53,7 +53,7 @@ export class Channel{
         const locationId = v4()
         const sender = this.sender
         console.log(`pc.localDescription`, pc.localDescription)
-        const matches = pc.localDescription.sdp.match(/\r\nm=([a-z]+) /g)
+        const matches = pc.localDescription.sdp.match(/\r\nm=(audio|video) /g)
         const transceivers = pc.getTransceivers()
         const mLines = []
         if (matches && matches.length === transceivers.length){

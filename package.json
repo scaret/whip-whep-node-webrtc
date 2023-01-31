@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/scaret/whip-whep-node-webrtc/issues"
   },
-  "homepage": "https://github.com/scaret/whip-whep-node-webrtc#readme"
+  "homepage": "https://github.com/scaret/whip-whep-node-webrtc#readme",
+  "dependencies": {
+    "badcert-register": "^1.0.0"
+  }
 }
