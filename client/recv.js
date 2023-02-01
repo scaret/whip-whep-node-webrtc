@@ -137,6 +137,13 @@ const initPC = ()=>{
         audioElem.srcObject = new MediaStream([transceiver.receiver.track])
         document.getElementById('medias').appendChild(audioElem)
     }
+    const dataChannelNum = parseInt(document.getElementById('dataChannelNum').value)
+    for (let i = 0; i <dataChannelNum; i++){
+        const dataChannel = rtc.peerConnection.createDataChannel(`datachannel${i}`)
+        dataChannel.onmessage = (evt)=>{
+            console.log(`dataChannel`, dataChannel.label, evt.data)
+        }
+    }
 }
 
 const startPull = async ()=>{

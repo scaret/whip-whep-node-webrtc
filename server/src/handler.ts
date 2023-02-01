@@ -5,6 +5,7 @@ import sdpTransform from 'sdp-transform'
 console.log(wrtc)
 
 import {endpoint} from "./Endpoint";
+import {PeerConnectionAgent} from "./PeerConnectionAgent";
 
 const dummpAudioTracks = []
 const dummyVideoTracks = []
@@ -24,52 +25,24 @@ export async function handleWhip(req, res, next){
         type: 'offer',
         sdp: req.sdp
     })
-    const pc = new wrtc.RTCPeerConnection()
-    let answerObj = null
-    let candidates = {}
-    const candidateDone = new Promise((res)=>{
-        pc.onicecandidate = (evt)=>{
-            // console.log('onicecandidate', evt.candidate)
-            if (evt.candidate){
-                if (!candidates[evt.candidate.sdpMid]){
-                    candidates[evt.candidate.sdpMid] = []
-                }
-                candidates[evt.candidate.sdpMid].push(evt.candidate)
-            } else {
-                answerObj.media.forEach((media, index)=>{
-                    if (candidates[index]){
-                        media.candidates = candidates[index].map((candidate)=>{
-                            const item = {
-                                foundation: parseInt(candidate.foundation),
-                                component: 1,
-                                transport: candidate.protocol,
-                                priority: candidate.priority,
-                                ip: candidate.address,
-                                port: candidate.port,
-                                type: candidate.type
-                            }
-                            return item
-                        })
-                    }
-                })
-                res(null)
-            }
-        }
-    })
-    await pc.setRemoteDescription(offer)
-    const answer = await pc.createAnswer()
-    answerObj = sdpTransform.parse(answer.sdp)
-    await pc.setLocalDescription(answer)
-    await candidateDone
+    const pcAgent = new PeerConnectionAgent('UPSTREAM', new wrtc.RTCPeerConnection())
+    // pcAgent.pc.ondatachannel = (evt: RTCDataChannelEvent)=>{
+    //     console.log(`ondatachannel`, evt.channel.label)
+    //     pc.dataChannels.push(evt.channel)
+    // }
+    await pcAgent.pc.setRemoteDescription(offer)
+    await pcAgent.createAnswerObj()
+    pcAgent.pc.setLocalDescription(pcAgent.answer.sessionDescription)
+    await pcAgent.waitForCandidateDone()
     // const videoSink = new wrtc.nonstandard.RTCVideoSink(videoTrack)
     // videoSink.addEventListener('frame', (data)=>{
     //     console.log(`frame ${data.frame.width} ${data.frame.height}`)
     // })
     const channelId = req.query.channelId || v4()
     const channel = endpoint.getChannel(channelId)
-    const locationId = channel.setSender(pc)
+    const locationId = channel.setSender(pcAgent)
     const location = `${req.get('origin')}/whip/${locationId}`
-    res.status(201).header('Location', location).end(sdpTransform.write(answerObj))
+    res.status(201).header('Location', location).end(sdpTransform.write(pcAgent.answer.obj))
 }
 
 /**
@@ -83,47 +56,16 @@ export async function handleWhep(req, res, next){
         type: 'offer',
         sdp: req.sdp
     })
-    const pc = new wrtc.RTCPeerConnection()
-    let answerObj = null
-    let candidates = {}
-    const candidateDone = new Promise((res)=>{
-        pc.onicecandidate = (evt)=>{
-            console.log('onicecandidate', evt.candidate)
-            if (evt.candidate){
-                if (!candidates[evt.candidate.sdpMid]){
-                    candidates[evt.candidate.sdpMid] = []
-                }
-                candidates[evt.candidate.sdpMid].push(evt.candidate)
-            } else {
-                answerObj.media.forEach((media, index)=>{
-                    if (candidates[index]){
-                        media.candidates = candidates[index].map((candidate)=>{
-                            const item = {
-                                foundation: parseInt(candidate.foundation),
-                                component: 1,
-                                transport: candidate.protocol,
-                                priority: candidate.priority,
-                                ip: candidate.address,
-                                port: candidate.port,
-                                type: candidate.type
-                            }
-                            return item
-                        })
-                    }
-                })
-                res(null)
-            }
-        }
-    })
+    const pcAgent = new PeerConnectionAgent('DOWNSTREAM', new wrtc.RTCPeerConnection())
     const matches = req.sdp.match(/\r\nm=([a-z]+) /g)
     if (matches){
         for (let i = 0; i < matches.length; i++){
             const kind = matches[i].substring(4, 9)
             console.log(`kind ${i} ${kind}`)
             if (kind === 'audio'){
-                pc.addTrack(dummpAudioTracks[i])
+                pcAgent.pc.addTrack(dummpAudioTracks[i])
             } else if (kind === 'video'){
-                pc.addTrack(dummyVideoTracks[i])
+                pcAgent.pc.addTrack(dummyVideoTracks[i])
             } else {
                 console.error(`Unrecognized m line ${matches[i]}`)
             }
@@ -131,15 +73,14 @@ export async function handleWhep(req, res, next){
     } else{
         console.error(`mLine error`, matches)
     }
-    await pc.setRemoteDescription(offer)
-    const answer = await pc.createAnswer()
-    answerObj = sdpTransform.parse(answer.sdp)
-    await pc.setLocalDescription(answer)
-    await candidateDone
+    await pcAgent.pc.setRemoteDescription(offer)
+    await pcAgent.createAnswerObj()
+    pcAgent.pc.setLocalDescription(pcAgent.answer.sessionDescription)
+    await pcAgent.waitForCandidateDone()
     const channelId = req.query.channelId || v4()
     const channel = endpoint.getChannel(channelId)
-    const locationId = channel.setReceiver(pc)
+    const locationId = channel.setReceiver(pcAgent)
     const location = `${req.get('origin')}/whep/${locationId}`
-    res.status(201).header('Location', location).end(sdpTransform.write(answerObj))
+    res.status(201).header('Location', location).end(sdpTransform.write(pcAgent.answer.obj))
 }
 

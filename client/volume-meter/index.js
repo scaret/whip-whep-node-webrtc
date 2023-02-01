@@ -11,6 +11,7 @@ const rtc = {
     offer: null,
     label: 'chat',
     dataChannel: null,
+    context: null,
 }
 
 const updateEndpointUrl = ()=>{
@@ -103,6 +104,18 @@ const initMediaStream = async ()=>{
         audioElem.srcObject = mediaStream
         document.getElementById('medias').appendChild(audioElem)
         audioCnt++
+        //Here
+        console.error('Here3')
+        // const audioLevelStream = new MediaStream([track.clone()])
+        // rtc.source = rtc.context.createMediaStreamSource(mediaStream)
+        // rtc.destination = rtc.context.createMediaStreamDestination()
+        rtc.audioWorkletNode = new AudioWorkletNode(rtc.context, 'vumeter')
+        // rtc.source.connect(rtc.audioWorkletNode)
+        // rtc.audioWorkletNode.connect(rtc.destination)
+        // rtc.source.connect(rtc.destination)
+        // rtc.audioWorkletNode.port.onmessage = (evt)=>{
+        //     document.getElementById('audioLevel').innerHTML = evt.data.volume
+        // }
     }
     for (let i = 0; i < cameraOptions.length; i++){
         const cameraOption = cameraOptions[i]
@@ -205,20 +218,18 @@ const initPC = ()=>{
         }
     }
     if (document.getElementById('enableDataChannel').checked){
-        const label = rtc.label
-        rtc.dataChannel = rtc.peerConnection.createDataChannel(label)
+        rtc.dataChannel = rtc.peerConnection.createDataChannel(rtc.label)
         rtc.dataChannel.onopen = (event)=>{
-            console.log(`channel ${label} open`)
+            console.log(`channel ${rtc.label} open`)
             document.getElementById('dataChannelMessage').disabled = false
             document.getElementById('sendDataChannel').disabled = false
-        }
-        rtc.dataChannel.onmessage = (event)=>{
-            console.log(`datachannel onmessage`, event.data)
         }
     }
 }
 
 const startPush = async ()=>{
+    rtc.context = new AudioContext()
+    await rtc.context.audioWorklet.addModule('./volumeProcessor.js')
     initPC()
     await Promise.all([createResource(), initMediaStream()])
 }
@@ -242,7 +253,7 @@ const refreshDevices = async ()=>{
         if (devices[i].kind === 'audioinput'){
             micHtml += `<option class="mic-option" value="${devices[i].deviceId}" ${micHtml ? "": "selected"}>${devices[i].label}</option>`
         } else if (devices[i].kind === 'videoinput'){
-            cameraHtml += `<option class="camera-option" value="${devices[i].deviceId}" ${cameraHtml ? "": "selected"}>${devices[i].label}</option>`
+            cameraHtml += `<option class="camera-option" value="${devices[i].deviceId}">${devices[i].label}</option>`
         }
     }
     document.getElementById('cameraIds').innerHTML = cameraHtml
