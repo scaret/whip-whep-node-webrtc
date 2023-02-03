@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WHIP</title>
+    <link rel="shortcut icon" href="#">
+</head>
+<body>
+    <label>
+        Endpoint
+        <input type="text" id="endpoint" size="100">
+    </label>
+    <br/>
+    <label>
+        Channel ID
+        <input type="text" id="channelId" size="100" value="abcabc">
+    </label>
+    <br/>
+    <label>
+        Authorization
+        <input type="text" id="authorization" size="100">
+    </label>
+    <br/>
+    <label>
+        Select Camera: <select id="cameraIds" multiple></select>
+    </label>
+    <label>
+        Select Microphone: <select id="micIds" multiple></select>
+    </label>
+    <button id="refresh-devices">Refresh Devices</button>
+    <br/>
+    <label>
+        <input type="checkbox" id="enableDataChannel">Enable Data Channel
+    </label>
+    <label><input type="text" id="dataChannelMessage" value="" size="80" disabled></label>
+    <button id="sendDataChannel" disabled>sendDataChannel</button>
+    <br/>
+    <button id="start-push">Push</button>
+    <a href="recv.html" target="_blank">recv</a>
+    <br/>
+    <div id="medias"></div>
+    <br/>
+    <span id="location"></span>
+    <br/>
+    <ul id="links"></ul>
+    <br/>
+    <script src="./vendor/axios.min.js"></script>
+    <script src="send.js"></script>
+</body>
+</html>
