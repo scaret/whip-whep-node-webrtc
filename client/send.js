@@ -1,6 +1,10 @@
 let endpoint = `${window.location.origin}/whip`
 // let endpoint = `https://whip.dev.eyevinn.technology/api/v1/whip/broadcaster`
 // eyelynn link: https://web.whip.eyevinn.technology/
+// let endpoint = `https://wtn.volcvideo.com/pub/63dc6e79f657bf012023f404/abcabc`
+
+// let authorization = 'Bearer 00163dc6e79f657bf012023f404QgBSE2UF+2/cY3uq5WMGAGFiY2FiYwYAZGVmZGVmBgAAAHuq5WMBAHuq5WMCAHuq5WMDAHuq5WMEAHuq5WMFAHuq5WMgAEZTyWPoVJhCjjrNls1EJtpXJ40TTCCh3lfprHUTnZol'
+let authorization = ''
 
 const rtc = {
     location: null,
@@ -40,11 +44,13 @@ const createResource = async ()=>{
     // 不要await
     rtc.peerConnection.setLocalDescription(rtc.offer)
 
-    updateEndpointUrl()
+    const endpoint = document.getElementById('endpoint').value
+    const authorization = document.getElementById('authorization').value
+
     const resp = await axios.post(endpoint, rtc.offer.sdp, {
         headers: {
-            authorization: 'whipit!',
-            'content-type': 'application/sdp'
+            Authorization: authorization,
+            'Content-Type': 'application/sdp',
         }
     })
     if (!resp.data || !resp.headers.location) {
@@ -213,7 +219,11 @@ const initPC = ()=>{
             document.getElementById('sendDataChannel').disabled = false
         }
         rtc.dataChannel.onmessage = (event)=>{
-            console.log(`datachannel onmessage`, event.data)
+            if (event.data instanceof ArrayBuffer){
+                console.log(String.fromCharCode.apply(null, new Uint8Array(event.data)))
+            } else {
+                console.log(`datachannel onmessage`, event.data)
+            }
         }
     }
 }
@@ -261,6 +271,7 @@ const sendDataChannel = async ()=>{
 const main = async ()=>{
     refreshDevices()
     document.getElementById('endpoint').value = endpoint
+    document.getElementById('authorization').value = authorization
     document.getElementById('start-push').onclick = startPush
     document.getElementById('refresh-devices').onclick = refreshDevices
     document.getElementById('sendDataChannel').onclick = sendDataChannel

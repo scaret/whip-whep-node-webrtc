@@ -1,6 +1,10 @@
 let endpoint = `${window.location.origin}/whep`
 // let endpoint = `https://whip.dev.eyevinn.technology/api/v1/whip/broadcaster`
 // eyelynn link: https://web.whip.eyevinn.technology/
+// let endpoint = `https://wtn.volcvideo.com/sub/63dc6e79f657bf012023f404/abcabc`
+
+// let authorization = 'Bearer 00163dc6e79f657bf012023f404QgBSE2UF+2/cY3uq5WMGAGFiY2FiYwYAZGVmZGVmBgAAAHuq5WMBAHuq5WMCAHuq5WMDAHuq5WMEAHuq5WMFAHuq5WMgAEZTyWPoVJhCjjrNls1EJtpXJ40TTCCh3lfprHUTnZol'
+let authorization = ''
 
 const rtc = {
     location: null,
@@ -45,11 +49,13 @@ const createResource = async ()=>{
     // 不要await
     rtc.peerConnection.setLocalDescription(rtc.offer)
 
-    updateEndpointUrl()
+    const endpoint = document.getElementById('endpoint').value
+    const authorization = document.getElementById('authorization').value
+
     const resp = await axios.post(endpoint, rtc.offer.sdp, {
         headers: {
-            authorization: 'whipit!',
-            'content-type': 'application/sdp'
+            Authorization: authorization,
+            'Content-Type': 'application/sdp'
         }
     })
     if (!resp.data || !resp.headers.location) {
@@ -141,7 +147,11 @@ const initPC = ()=>{
     for (let i = 0; i <dataChannelNum; i++){
         const dataChannel = rtc.peerConnection.createDataChannel(`datachannel${i}`)
         dataChannel.onmessage = (evt)=>{
-            console.log(`dataChannel`, dataChannel.label, evt.data)
+            if (event.data instanceof ArrayBuffer){
+                console.log(String.fromCharCode.apply(null, new Uint8Array(event.data)))
+            } else {
+                console.log(`datachannel onmessage`, event.data)
+            }
         }
     }
 }
