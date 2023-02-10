@@ -250,7 +250,7 @@ const refreshDevices = async ()=>{
     let micHtml = ''
     for (let i in devices){
         if (devices[i].kind === 'audioinput'){
-            micHtml += `<option class="mic-option" value="${devices[i].deviceId}" ${micHtml ? "": "selected"}>${devices[i].label}</option>`
+            micHtml += `<option class="mic-option" value="${devices[i].deviceId}">${devices[i].label}</option>`
         } else if (devices[i].kind === 'videoinput'){
             cameraHtml += `<option class="camera-option" value="${devices[i].deviceId}" ${cameraHtml ? "": "selected"}>${devices[i].label}</option>`
         }
