@@ -26,7 +26,7 @@ export class PeerConnectionAgent{
         this.pc = pc
         this.direction = direction
         this.pc.onicecandidate = (evt)=>{
-            console.log('onicecandidate', evt.candidate)
+            // console.log('onicecandidate', evt.candidate)
             if (evt.candidate){
                 if (!this.candidates[evt.candidate.sdpMid]){
                     this.candidates[evt.candidate.sdpMid] = []

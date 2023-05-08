@@ -3,7 +3,8 @@
 // eyelynn link: https://web.whip.eyevinn.technology/
 let endpoint = `https://wtn.volcvideo.com/pub/63dc6e79f657bf012023f404/abcabc`
 
-let authorization = 'Bearer 00163dc6e79f657bf012023f404QgBSE2UF+2/cY3uq5WMGAGFiY2FiYwYAZGVmZGVmBgAAAHuq5WMBAHuq5WMCAHuq5WMDAHuq5WMEAHuq5WMFAHuq5WMgAEZTyWPoVJhCjjrNls1EJtpXJ40TTCCh3lfprHUTnZol'
+// 5月15日到期
+let authorization = 'Bearer 00163dc6e79f657bf012023f404QgADYvwAnbBYZB3rYWQGAGFiY2FiYwYAMTIzMTIzBgAAAB3rYWQBAB3rYWQCAB3rYWQDAB3rYWQEAB3rYWQFAB3rYWQgABuvfGlmonfz2EamyeW2OQZGk71vOles+nNqq062wGQM'
 // let authorization = ''
 
 const rtc = {

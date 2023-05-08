@@ -49,9 +49,7 @@ const createResource = async ()=>{
     // 不要await
     rtc.peerConnection.setLocalDescription(rtc.offer)
 
-    const endpoint = document.getElementById('endpoint').value
-    const authorization = document.getElementById('authorization').value
-
+    updateEndpointUrl()
     const resp = await axios.post(endpoint, rtc.offer.sdp, {
         headers: {
             Authorization: authorization,
