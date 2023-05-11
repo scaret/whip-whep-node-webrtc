@@ -95,7 +95,9 @@ const initMediaStream = async ()=>{
         console.log(`Audio ${micOption.value} ${micOption.innerText}`)
         const mediaStream = await navigator.mediaDevices.getUserMedia({
             audio: {
-                deviceId: micOption.value
+                deviceId: micOption.value,
+                channelCount: parseInt(document.getElementById('channelCount').value),
+                sampleRate: parseInt(document.getElementById('sampleRate').value)
             }
         })
         const track = mediaStream.getTracks()[0]
